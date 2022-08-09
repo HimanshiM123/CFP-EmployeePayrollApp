@@ -4,7 +4,15 @@ import com.bridgelabz.employeepayrollapp.dto.EmployeeDto;
 import com.bridgelabz.employeepayrollapp.model.EmployeeModel;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface IEmployeeService {
     EmployeeModel addemployee(EmployeeDto employeeDto);
+
+    EmployeeModel updateEmployee(long id, EmployeeDto employeeDto);
+
+    List<EmployeeModel> getEmpData();
+
+    EmployeeModel deleteEmployee(Long id);
 }

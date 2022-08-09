@@ -1,12 +1,14 @@
 package com.bridgelabz.employeepayrollapp.model;
 
 import com.bridgelabz.employeepayrollapp.dto.EmployeeDto;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Employee")
+@Data
 public class EmployeeModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
