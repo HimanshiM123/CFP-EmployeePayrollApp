@@ -1,6 +1,8 @@
 package com.bridgelabz.employeepayrollapp.service;
 
 import com.bridgelabz.employeepayrollapp.Exeption.EmployeeNotFoundException;
+import com.bridgelabz.employeepayrollapp.Util.Response;
+import com.bridgelabz.employeepayrollapp.Util.TokenUtil;
 import com.bridgelabz.employeepayrollapp.dto.EmployeeDto;
 import com.bridgelabz.employeepayrollapp.model.EmployeeModel;
 import com.bridgelabz.employeepayrollapp.repositpry.IEmployeeRepository;
@@ -15,6 +17,8 @@ import java.util.Optional;
 public class EmployeeService implements IEmployeeService{
     @Autowired
     IEmployeeRepository employeeRepository;
+    @Autowired
+    TokenUtil tokenUtil;
     @Override
     public EmployeeModel addemployee(EmployeeDto employeeDto) {
         EmployeeModel employeeModel = new EmployeeModel(employeeDto);
@@ -40,12 +44,17 @@ public class EmployeeService implements IEmployeeService{
     }
 
     @Override
-    public List<EmployeeModel> getEmpData() {
-        List<EmployeeModel> getAllEmployee = employeeRepository.findAll();
-        if(getAllEmployee.size()>0)
-            return getAllEmployee;
-        else
-            throw new EmployeeNotFoundException(400,"No DATA Present");
+    public List<EmployeeModel> getEmpData(String token) {
+        Long empId = tokenUtil.decodeToken(token);
+        Optional<EmployeeModel> isEmployeePresent=employeeRepository.findById(empId);
+        if (isEmployeePresent.isPresent()) {
+            List<EmployeeModel> getAllEmployee = employeeRepository.findAll();
+            if (getAllEmployee.size() > 0)
+                return getAllEmployee;
+            else
+                throw new EmployeeNotFoundException(400, "No DATA Present");
+        }
+        throw new EmployeeNotFoundException(400, "Employee Not found");
     }
     @Override
     public EmployeeModel deleteEmployee(Long id) {
@@ -55,5 +64,18 @@ public class EmployeeService implements IEmployeeService{
             return isEmployeePresent.get();
         }
         throw new EmployeeNotFoundException(400,"Employee Not Present");
+    }
+
+    @Override
+    public Response login(String email, String password) {
+        Optional<EmployeeModel> isEmailPresent=employeeRepository.findByEmailId(email);
+        if (isEmailPresent.isPresent()){
+            if (isEmailPresent.get().getPassword().equals(password)) {
+                String token = tokenUtil.crateToken(isEmailPresent.get().getEmployeeId());
+                return new Response("login succesfull", 200, token);
+            }
+            throw new EmployeeNotFoundException(400, "Invalid credintials");
+        }
+        throw new EmployeeNotFoundException(400, "Employee not found");
     }
 }
