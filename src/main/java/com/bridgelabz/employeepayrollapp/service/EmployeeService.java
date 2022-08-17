@@ -19,11 +19,16 @@ public class EmployeeService implements IEmployeeService{
     IEmployeeRepository employeeRepository;
     @Autowired
     TokenUtil tokenUtil;
+    @Autowired
+    MailService mailService;
     @Override
     public EmployeeModel addemployee(EmployeeDto employeeDto) {
         EmployeeModel employeeModel = new EmployeeModel(employeeDto);
         employeeModel.setRegisteredDate(LocalDateTime.now());
         employeeRepository.save(employeeModel);
+        String body="Employee is added succesfully with employeeId "+employeeModel.getEmployeeId();
+        String subject="Employee Registration Succesfull";
+        mailService.send(employeeModel.getEmailId(),subject,body);
         return employeeModel;
     }
     @Override
