@@ -17,5 +17,4 @@ public interface IEmployeeService {
 
     EmployeeModel deleteEmployee(Long id);
 
-    Response login(String email, String password);
 }

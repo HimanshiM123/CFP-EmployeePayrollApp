@@ -1,7 +1,6 @@
 package com.bridgelabz.employeepayrollapp.service;
 
 import com.bridgelabz.employeepayrollapp.Exeption.EmployeeNotFoundException;
-import com.bridgelabz.employeepayrollapp.Util.Response;
 import com.bridgelabz.employeepayrollapp.Util.TokenUtil;
 import com.bridgelabz.employeepayrollapp.dto.EmployeeDto;
 import com.bridgelabz.employeepayrollapp.model.EmployeeModel;
@@ -9,7 +8,7 @@ import com.bridgelabz.employeepayrollapp.repositpry.IEmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,9 +23,9 @@ public class EmployeeService implements IEmployeeService{
     @Override
     public EmployeeModel addemployee(EmployeeDto employeeDto) {
         EmployeeModel employeeModel = new EmployeeModel(employeeDto);
-        employeeModel.setRegisteredDate(LocalDateTime.now());
+        employeeModel.setJoiningDate(LocalDate.now());
         employeeRepository.save(employeeModel);
-        String body="Employee is added succesfully with employeeId "+employeeModel.getEmployeeId();
+        String body="Employee is added succesfully with employeeId "+employeeModel.getId();
         String subject="Employee Registration Succesfull";
         mailService.send(employeeModel.getEmailId(),subject,body);
         return employeeModel;
@@ -37,10 +36,12 @@ public class EmployeeService implements IEmployeeService{
         if(isEmployeePresent.isPresent()){
             isEmployeePresent.get().setFirstName(employeeDto.getFirstName());
             isEmployeePresent.get().setLastName(employeeDto.getLastName());
-            isEmployeePresent.get().setCompanyName(employeeDto.getCompanyName());
+            isEmployeePresent.get().setGender(employeeDto.getGender());
             isEmployeePresent.get().setDepartment(employeeDto.getDepartment());
             isEmployeePresent.get().setSalary(employeeDto.getSalary());
-            isEmployeePresent.get().setUpdatedDate(LocalDateTime.now());
+            isEmployeePresent.get().setJoiningDate(LocalDate.now());
+            isEmployeePresent.get().setProfilePic(employeeDto.getProfilePic());
+            isEmployeePresent.get().setNote(employeeDto.getNote());
             employeeRepository.save(isEmployeePresent.get());
             return isEmployeePresent.get();
 
@@ -71,16 +72,4 @@ public class EmployeeService implements IEmployeeService{
         throw new EmployeeNotFoundException(400,"Employee Not Present");
     }
 
-    @Override
-    public Response login(String email, String password) {
-        Optional<EmployeeModel> isEmailPresent=employeeRepository.findByEmailId(email);
-        if (isEmailPresent.isPresent()){
-            if (isEmailPresent.get().getPassword().equals(password)) {
-                String token = tokenUtil.crateToken(isEmailPresent.get().getEmployeeId());
-                return new Response("login succesfull", 200, token);
-            }
-            throw new EmployeeNotFoundException(400, "Invalid credintials");
-        }
-        throw new EmployeeNotFoundException(400, "Employee not found");
-    }
 }

@@ -3,6 +3,8 @@ package com.bridgelabz.employeepayrollapp.Util;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 public class Response {
@@ -14,4 +16,5 @@ public class Response {
     public Response() {
 
     }
+
 }
